@@ -1,95 +1,89 @@
+
+#include <CytronMotorDriver.h>
+
 #define SHIFTER_REVERSE_PIN 14 // WHITE
 #define SHIFTER_FORWARD_PIN 16 // GREEN
 #define SHIFTER_FAST_PIN 18 // BLUE
 #define ACCELERATOR_PIN 15
 
-#define MOTOR1_RPWM_PIN 5 // GREEN
-#define MOTOR1_LPWM_PIN 6 // YELLOW
-#define MOTOR1_R_EN_PIN 7 // PURPLE
-#define MOTOR1_L_EN_PIN 8 // BLUE
+/**
+ * Arduino D6  - Motor Driver PWM 1 Input
+ * Arduino D7  - Motor Driver DIR 1 Input
+ * Arduino D10  - Motor Driver PWM 2 Input
+ * Arduino D11 - Motor Driver DIR 2 Input
+ * Arduino GND - Motor Driver GND
+ */
 
-#define MOTOR2_RPWM_PIN 9 // GREEN
-#define MOTOR2_LPWM_PIN 10 // YELLOW
-#define MOTOR2_R_EN_PIN 11 // PURPLE
-#define MOTOR2_L_EN_PIN 12 // BLUE
+#define MOTOR1_PWM_PIN 6
+#define MOTOR1_DIR_PIN 7 // PURPLE
+
+#define MOTOR2_PWM_PIN 10 // YELLOW
+#define MOTOR2_DIR_PIN 11 // PURPLE
+
+#define DEBUG false
+
+// Configure the motor driver.
+CytronMD motor1(PWM_DIR, MOTOR1_PWM_PIN, MOTOR1_DIR_PIN); 
+CytronMD motor2(PWM_DIR, MOTOR2_PWM_PIN, MOTOR2_DIR_PIN);
+
 
 int currentPower = 0;
 int targetPower = 0;
 
 void stop() {
-  digitalWrite(MOTOR1_R_EN_PIN, LOW);
-  digitalWrite(MOTOR1_L_EN_PIN, LOW);
-  digitalWrite(MOTOR2_R_EN_PIN, LOW);
-  digitalWrite(MOTOR2_L_EN_PIN, LOW);
-
-  digitalWrite(MOTOR1_RPWM_PIN, LOW);
-  digitalWrite(MOTOR1_LPWM_PIN, LOW);
-  digitalWrite(MOTOR2_RPWM_PIN, LOW);
-  digitalWrite(MOTOR2_LPWM_PIN, LOW);
-}
-
-void start() {
-  //Serial.println("Start");
-  digitalWrite(MOTOR1_L_EN_PIN, HIGH);
-  digitalWrite(MOTOR1_R_EN_PIN, HIGH);
-  digitalWrite(MOTOR2_L_EN_PIN, HIGH);
-  digitalWrite(MOTOR2_R_EN_PIN, HIGH);
+  if (DEBUG) {
+    Serial.println("Stop");
+  }
+  targetPower = 0;
 }
 
 void reverse() {
-  //Serial.println("Reverse");
-  targetPower = 95;
-  analogWrite(MOTOR1_RPWM_PIN, 0);
-  analogWrite(MOTOR1_LPWM_PIN, currentPower);
-  analogWrite(MOTOR2_RPWM_PIN, 0);
-  analogWrite(MOTOR2_LPWM_PIN, currentPower);
+  if (DEBUG) {
+    Serial.println("Reverse");
+  }
+  targetPower = -95;
 }
 
 void forward() {
-  //Serial.println("Forward");
+  if (DEBUG) {
+    Serial.println("Forward");
+  }
   targetPower = 127;
-  //Serial.println(currentPower);
-  analogWrite(MOTOR1_RPWM_PIN, currentPower);
-  analogWrite(MOTOR1_LPWM_PIN, 0);
-  analogWrite(MOTOR2_RPWM_PIN, currentPower);
-  analogWrite(MOTOR2_LPWM_PIN, 0);
 }
 
 void fast() {
-  //Serial.println("Fast");
+  if (DEBUG) {
+    Serial.println("Fast");
+  }
   targetPower = 255;
-  analogWrite(MOTOR1_RPWM_PIN, currentPower);
-  analogWrite(MOTOR1_LPWM_PIN, 0);
-  analogWrite(MOTOR2_RPWM_PIN, currentPower);
-  analogWrite(MOTOR2_LPWM_PIN, 0);
 }
 
 void setup() {
-  Serial.begin(9600);
+  if (DEBUG) {
+    Serial.begin(9600);
+  }
   // put your setup code here, to run once:
   pinMode(SHIFTER_REVERSE_PIN, INPUT_PULLUP);
   pinMode(SHIFTER_FORWARD_PIN, INPUT_PULLUP);
   pinMode(SHIFTER_FAST_PIN, INPUT_PULLUP);
   pinMode(ACCELERATOR_PIN, INPUT_PULLUP);
 
-  pinMode(MOTOR1_RPWM_PIN, OUTPUT);
-  pinMode(MOTOR1_LPWM_PIN, OUTPUT);
-  pinMode(MOTOR1_R_EN_PIN, OUTPUT);
-  pinMode(MOTOR1_L_EN_PIN, OUTPUT);
+  pinMode(MOTOR1_PWM_PIN, OUTPUT);
+  pinMode(MOTOR1_DIR_PIN, OUTPUT);
 
-  pinMode(MOTOR2_RPWM_PIN, OUTPUT);
-  pinMode(MOTOR2_LPWM_PIN, OUTPUT);
-  pinMode(MOTOR2_R_EN_PIN, OUTPUT);
-  pinMode(MOTOR2_L_EN_PIN, OUTPUT);
+  pinMode(MOTOR2_PWM_PIN, OUTPUT);
+  pinMode(MOTOR2_DIR_PIN, OUTPUT);
+
   stop();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  // char buffer[40];
-  // sprintf(buffer, "%d, %d, %d, %d", digitalRead(SHIFTER_REVERSE_PIN), digitalRead(SHIFTER_FORWARD_PIN), digitalRead(SHIFTER_FAST_PIN), digitalRead(ACCELERATOR_PIN));
-  // Serial.println(buffer);
-  //stop();
+  if (DEBUG) {
+    char buffer[40];
+    sprintf(buffer, "%d, %d, %d, %d", digitalRead(SHIFTER_REVERSE_PIN), digitalRead(SHIFTER_FORWARD_PIN), digitalRead(SHIFTER_FAST_PIN), digitalRead(ACCELERATOR_PIN));
+    Serial.println(buffer);
+  }
+
 
   // Read the pins and set the target power.
   if (digitalRead(SHIFTER_REVERSE_PIN) == LOW) {
@@ -98,28 +92,30 @@ void loop() {
     fast();
   } else if (digitalRead(SHIFTER_FORWARD_PIN) == LOW) {
     forward();
+  } else {
+    stop();
   }
 
-  // Now check the accelterator. If it's not pressed then override the target power with 0
-  if (digitalRead(ACCELERATOR_PIN) == LOW) {
-    start();
-  } else if (digitalRead(ACCELERATOR_PIN) == HIGH) {
-    targetPower = 0;
-    if (currentPower == 0) {
-      stop();
-    }
+  // Now check the accelterator. If it's not pressed then stop. (pin is pulled high = off when pressed)
+  if (digitalRead(ACCELERATOR_PIN) == HIGH) {
+    stop();
   }
+  if (DEBUG) {
+    Serial.println(currentPower);
+  }
+  motor1.setSpeed(currentPower);
+  motor2.setSpeed(currentPower);
 
   // Now increase the power incrementally til the target.
   if (currentPower < targetPower) {
     currentPower++;
-    delay(15);
+    delay(10);
   }
   if (currentPower > targetPower) {
     currentPower--;
-    delay(2);
+    delay(10);
   }
-
-  // delay(50);
-  // Serial.println(currentPower);
+  if (DEBUG) {
+    delay(500);
+  }
 }
