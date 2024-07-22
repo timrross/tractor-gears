@@ -1,10 +1,10 @@
 
 #include <CytronMotorDriver.h>
 
-#define SHIFTER_REVERSE_PIN 14 // WHITE
-#define SHIFTER_FORWARD_PIN 16 // GREEN
-#define SHIFTER_FAST_PIN 18 // BLUE
-#define ACCELERATOR_PIN 15
+#define SHIFTER_REVERSE_PIN 17 // WHITE
+#define SHIFTER_FORWARD_PIN 19 // GREEN
+#define SHIFTER_FAST_PIN 21 // BLUE
+#define ACCELERATOR_PIN 14
 
 /**
  * Arduino D6  - Motor Driver PWM 1 Input
@@ -14,11 +14,11 @@
  * Arduino GND - Motor Driver GND
  */
 
-#define MOTOR1_PWM_PIN 6
-#define MOTOR1_DIR_PIN 7 // PURPLE
+#define MOTOR1_PWM_PIN 5
+#define MOTOR1_DIR_PIN 4 // PURPLE
 
-#define MOTOR2_PWM_PIN 10 // YELLOW
-#define MOTOR2_DIR_PIN 11 // PURPLE
+#define MOTOR2_PWM_PIN 3 // YELLOW
+#define MOTOR2_DIR_PIN 2 // PURPLE
 
 #define DEBUG false
 
