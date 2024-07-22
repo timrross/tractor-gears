@@ -7,10 +7,10 @@
 #define ACCELERATOR_PIN 14
 
 /**
- * Arduino D6  - Motor Driver PWM 1 Input
- * Arduino D7  - Motor Driver DIR 1 Input
- * Arduino D10  - Motor Driver PWM 2 Input
- * Arduino D11 - Motor Driver DIR 2 Input
+ * Arduino D5  - Motor Driver PWM 1 Input
+ * Arduino D4  - Motor Driver DIR 1 Input
+ * Arduino D3  - Motor Driver PWM 2 Input
+ * Arduino D2 - Motor Driver DIR 2 Input
  * Arduino GND - Motor Driver GND
  */
 
