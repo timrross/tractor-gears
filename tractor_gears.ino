@@ -29,17 +29,24 @@ CytronMD motor2(PWM_DIR, MOTOR2_PWM_PIN, MOTOR2_DIR_PIN);
 
 int currentPower = 0;
 int targetPower = 0;
+int acceleration = 10; // This is the ms delay between incrementing the power. 
 
 void stop() {
   if (DEBUG) {
     Serial.println("Stop");
   }
+  acceleration = 10; // Reset
   targetPower = 0;
 }
 
 void reverse() {
   if (DEBUG) {
     Serial.println("Reverse");
+  }
+  if (currentPower > 0) {
+    acceleration = 3; 
+  } else {
+    acceleration = 15; 
   }
   targetPower = -95;
 }
@@ -48,6 +55,7 @@ void forward() {
   if (DEBUG) {
     Serial.println("Forward");
   }
+  acceleration = 10;
   targetPower = 127;
 }
 
@@ -55,6 +63,7 @@ void fast() {
   if (DEBUG) {
     Serial.println("Fast");
   }
+  acceleration = 3; // Reset
   targetPower = 255;
 }
 
@@ -109,11 +118,11 @@ void loop() {
   // Now increase the power incrementally til the target.
   if (currentPower < targetPower) {
     currentPower++;
-    delay(10);
+    delay(acceleration);
   }
   if (currentPower > targetPower) {
     currentPower--;
-    delay(10);
+    delay(acceleration);
   }
   if (DEBUG) {
     delay(500);
