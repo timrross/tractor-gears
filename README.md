@@ -16,6 +16,9 @@ I decided that I would remove the switches from the motor loop, and run the wire
 
 ## Solution
 
+### SEE BELOW for v2 UPDATE
+
+#### v1.
 I purchased two [BTS7960B PWM Motor Drivers](https://amzn.to/3VZQlwF) from amazon, which are controlled using pwm signals from the Nano Every. The Gear Shifter and the Accelerator Pedal 
 are now wired to inputs on the Arduino, so there is no issue of overload.
 The battery is connected to the motor drivers in parallel, and then each motor driver is connected to a motor, so each motor can pull as much current as it needs. (The controllers have peak current of 43A!).
@@ -27,3 +30,12 @@ The arduino is powered from the batteries via a [LM317 DC-DC step down convertor
 I made a custom break out board with screw terminals and dupont connectors to hold the arduino. 
 
 I'll add a frizting and some photos when I get a moment. 
+
+### v2
+The motor drivers I used below in V1 seemed to be very unreliable at higher voltage (12v was fine, but 24v was inconsistent). The controllers were stuttering 
+and not working reliably at 100% power. I even bought a 3rd one, to see if I had a faulty module, and it still didn't work quite right, so I switched motor 
+controller to a [Cytron MDD20A](https://www.cytron.io/p-20amp-6v-30v-dc-motor-driver-2-channels). The new controller has worked flawlessly since I installed it. It's a much better 
+product and would have saved me lots of time if I had used that originally.
+
+It now uses less pins on the Arduino, and has better build in protection from under voltage and overcurrent. A strong recommend from me. The Tractor now flies at full speed. 
+
